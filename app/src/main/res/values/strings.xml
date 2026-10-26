@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">CampusFlow</string>
+    <string name="app_subtitle">Student Productivity Tracker</string>
+
+    <!-- Dashboard Strings -->
+    <string name="dashboard_greeting">Welcome Back, Student! 🎓</string>
+    <string name="dashboard_overview">Overview &amp; Progress</string>
+    <string name="stat_total">Total</string>
+    <string name="stat_pending">Pending</string>
+    <string name="stat_completed">Completed</string>
+    <string name="stat_high_priority">High Priority</string>
+
+    <string name="section_upcoming_assignments">Upcoming Assignments</string>
+    <string name="filter_all">All</string>
+    <string name="filter_pending">Pending</string>
+    <string name="filter_completed">Completed</string>
+    <string name="filter_high_priority">High Priority</string>
+
+    <string name="btn_add_assignment">Add Assignment</string>
+    <string name="empty_state_title">No Assignments Found</string>
+    <string name="empty_state_subtitle">Tap + Add Assignment to create a new task and stay organized!</string>
+
+    <!-- Add Assignment Screen Strings -->
+    <string name="title_add_assignment">Add New Assignment</string>
+    <string name="label_title">Assignment Title *</string>
+    <string name="hint_title">e.g., Data Structures Lab Report</string>
+    <string name="label_subject">Subject / Course *</string>
+    <string name="hint_subject">e.g., Computer Science, Mathematics</string>
+    <string name="label_description">Description / Notes</string>
+    <string name="hint_description">Add key instructions, chapters, or submission details&#8230;</string>
+    <string name="label_due_date">Due Date *</string>
+    <string name="label_due_date_format">Due %1$s</string>
+    <string name="hint_due_date">Select due date</string>
+    <string name="label_priority">Priority Level</string>
+
+    <string name="priority_high">High</string>
+    <string name="priority_medium">Medium</string>
+    <string name="priority_low">Low</string>
+
+    <string name="btn_save_assignment">Save Assignment</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- Validation & Toasts -->
+    <string name="error_title_required">Title is required</string>
+    <string name="error_subject_required">Subject is required</string>
+    <string name="error_date_required">Please select a due date</string>
+    <string name="toast_assignment_saved">Assignment saved successfully! ✨</string>
+    <string name="toast_status_updated">Assignment status updated</string>
+    <string name="toast_assignment_deleted">Assignment deleted</string>
+</resources>

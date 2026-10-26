@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Brand Colors -->
+    <color name="primary_indigo">#4F46E5</color>
+    <color name="primary_indigo_light">#EEF2FF</color>
+    <color name="primary_dark">#3730A3</color>
+    <color name="accent_teal">#0EA5E9</color>
+    <color name="accent_teal_light">#E0F2FE</color>
+
+    <!-- Status Colors -->
+    <color name="status_completed">#10B981</color>
+    <color name="status_completed_light">#D1FAE5</color>
+    <color name="status_pending">#F59E0B</color>
+    <color name="status_pending_light">#FEF3C7</color>
+
+    <!-- Priority Colors -->
+    <color name="priority_high">#EF4444</color>
+    <color name="priority_high_bg">#FEE2E2</color>
+    <color name="priority_medium">#F59E0B</color>
+    <color name="priority_medium_bg">#FEF3C7</color>
+    <color name="priority_low">#10B981</color>
+    <color name="priority_low_bg">#D1FAE5</color>
+
+    <!-- Text & Neutral Colors -->
+    <color name="bg_light">#F8FAFC</color>
+    <color name="card_border">#E2E8F0</color>
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#475569</color>
+    <color name="text_muted">#94A3B8</color>
+</resources>
