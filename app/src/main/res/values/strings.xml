@@ -45,6 +45,7 @@
     <string name="error_subject_required">Subject is required</string>
     <string name="error_date_required">Please select a due date</string>
     <string name="toast_assignment_saved">Assignment saved successfully! ✨</string>
+    <string name="toast_assignment_save_failed">Failed to save assignment. Please try again.</string>
     <string name="toast_status_updated">Assignment status updated</string>
     <string name="toast_assignment_deleted">Assignment deleted</string>
 </resources>

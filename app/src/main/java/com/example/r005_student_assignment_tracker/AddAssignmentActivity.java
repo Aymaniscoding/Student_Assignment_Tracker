@@ -192,13 +192,17 @@ public class AddAssignmentActivity extends AppCompatActivity {
         }
 
         Assignment newAssignment = new Assignment(title, subject, description, dueDateStr, selectedDueDateMillis, priority);
-        repository.addAssignment(newAssignment);
+        boolean success = repository.addAssignment(newAssignment);
 
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra(EXTRA_ASSIGNMENT, newAssignment);
-        setResult(RESULT_OK, resultIntent);
+        if (success) {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra(EXTRA_ASSIGNMENT, newAssignment);
+            setResult(RESULT_OK, resultIntent);
 
-        Toast.makeText(this, R.string.toast_assignment_saved, Toast.LENGTH_SHORT).show();
-        finish();
+            Toast.makeText(this, R.string.toast_assignment_saved, Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            Toast.makeText(this, R.string.toast_assignment_save_failed, Toast.LENGTH_SHORT).show();
+        }
     }
 }
