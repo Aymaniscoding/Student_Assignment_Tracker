@@ -51,4 +51,16 @@ public class AssignmentTest {
         assertEquals("Medium", assignment.getPriority());
         assertTrue(assignment.isCompleted());
     }
+
+    @Test
+    public void testToggleCompletionState() {
+        Assignment assignment = new Assignment();
+        assertFalse(assignment.isCompleted());
+
+        assignment.setCompleted(true);
+        assertTrue(assignment.isCompleted());
+
+        assignment.setCompleted(false);
+        assertFalse(assignment.isCompleted());
+    }
 }

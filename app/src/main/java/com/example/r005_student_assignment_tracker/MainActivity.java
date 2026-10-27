@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.util.ArrayList;
@@ -191,8 +192,22 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
 
     @Override
     public void onDeleteClick(Assignment assignment) {
-        repository.deleteAssignment(assignment.getId());
-        loadDashboardData();
-        Toast.makeText(this, R.string.toast_assignment_deleted, Toast.LENGTH_SHORT).show();
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.dialog_delete_title)
+                .setMessage(getString(R.string.dialog_delete_message, assignment.getTitle()))
+                .setPositiveButton(R.string.btn_delete, (dialog, which) -> {
+                    repository.deleteAssignment(assignment.getId());
+                    loadDashboardData();
+                    Toast.makeText(this, R.string.toast_assignment_deleted, Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton(R.string.btn_cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    @Override
+    public void onEditClick(Assignment assignment) {
+        Intent intent = new Intent(MainActivity.this, AddAssignmentActivity.class);
+        intent.putExtra(AddAssignmentActivity.EXTRA_ASSIGNMENT, assignment);
+        addAssignmentLauncher.launch(intent);
     }
 }

@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -31,6 +32,7 @@ public class AddAssignmentActivity extends AppCompatActivity {
 
     public static final String EXTRA_ASSIGNMENT = "extra_assignment";
 
+    private TextView tvHeaderTitle;
     private TextInputLayout tilTitle, tilSubject, tilDueDate;
     private TextInputEditText etTitle, etDescription, etDueDate;
     private MaterialAutoCompleteTextView etSubject;
@@ -42,6 +44,9 @@ public class AddAssignmentActivity extends AppCompatActivity {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
 
     private AssignmentRepository repository;
+
+    private Assignment existingAssignment;
+    private boolean isEditMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +66,11 @@ public class AddAssignmentActivity extends AppCompatActivity {
         setupSubjectDropdown();
         setupDatePicker();
         setupListeners();
+        checkEditMode();
     }
 
     private void initViews() {
+        tvHeaderTitle = findViewById(R.id.tvHeaderTitle);
         ibBack = findViewById(R.id.ibBack);
         tilTitle = findViewById(R.id.tilTitle);
         tilSubject = findViewById(R.id.tilSubject);
@@ -83,6 +90,41 @@ public class AddAssignmentActivity extends AppCompatActivity {
         cal.add(Calendar.DAY_OF_MONTH, 1);
         selectedDueDateMillis = cal.getTimeInMillis();
         etDueDate.setText(dateFormat.format(cal.getTime()));
+    }
+
+    private void checkEditMode() {
+        if (getIntent() != null && getIntent().hasExtra(EXTRA_ASSIGNMENT)) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                existingAssignment = getIntent().getSerializableExtra(EXTRA_ASSIGNMENT, Assignment.class);
+            } else {
+                //noinspection deprecation
+                existingAssignment = (Assignment) getIntent().getSerializableExtra(EXTRA_ASSIGNMENT);
+            }
+            if (existingAssignment != null) {
+                isEditMode = true;
+
+                if (tvHeaderTitle != null) {
+                    tvHeaderTitle.setText(R.string.title_edit_assignment);
+                }
+                btnSaveAssignment.setText(R.string.btn_update_assignment);
+
+                etTitle.setText(existingAssignment.getTitle());
+                etSubject.setText(existingAssignment.getSubject());
+                etDescription.setText(existingAssignment.getDescription());
+
+                selectedDueDateMillis = existingAssignment.getDueDateMillis();
+                etDueDate.setText(existingAssignment.getDueDate());
+
+                String priority = existingAssignment.getPriority();
+                if ("High".equalsIgnoreCase(priority)) {
+                    chipGroupPriority.check(R.id.chipPriorityHigh);
+                } else if ("Low".equalsIgnoreCase(priority)) {
+                    chipGroupPriority.check(R.id.chipPriorityLow);
+                } else {
+                    chipGroupPriority.check(R.id.chipPriorityMedium);
+                }
+            }
+        }
     }
 
     private void setupSubjectDropdown() {
@@ -191,18 +233,39 @@ public class AddAssignmentActivity extends AppCompatActivity {
             priority = "Low";
         }
 
-        Assignment newAssignment = new Assignment(title, subject, description, dueDateStr, selectedDueDateMillis, priority);
-        boolean success = repository.addAssignment(newAssignment);
+        if (isEditMode && existingAssignment != null) {
+            existingAssignment.setTitle(title);
+            existingAssignment.setSubject(subject);
+            existingAssignment.setDescription(description);
+            existingAssignment.setDueDate(dueDateStr);
+            existingAssignment.setDueDateMillis(selectedDueDateMillis);
+            existingAssignment.setPriority(priority);
 
-        if (success) {
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra(EXTRA_ASSIGNMENT, newAssignment);
-            setResult(RESULT_OK, resultIntent);
+            boolean success = repository.updateAssignment(existingAssignment);
+            if (success) {
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra(EXTRA_ASSIGNMENT, existingAssignment);
+                setResult(RESULT_OK, resultIntent);
 
-            Toast.makeText(this, R.string.toast_assignment_saved, Toast.LENGTH_SHORT).show();
-            finish();
+                Toast.makeText(this, R.string.toast_assignment_updated, Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, R.string.toast_assignment_save_failed, Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Toast.makeText(this, R.string.toast_assignment_save_failed, Toast.LENGTH_SHORT).show();
+            Assignment newAssignment = new Assignment(title, subject, description, dueDateStr, selectedDueDateMillis, priority);
+            boolean success = repository.addAssignment(newAssignment);
+
+            if (success) {
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra(EXTRA_ASSIGNMENT, newAssignment);
+                setResult(RESULT_OK, resultIntent);
+
+                Toast.makeText(this, R.string.toast_assignment_saved, Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, R.string.toast_assignment_save_failed, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

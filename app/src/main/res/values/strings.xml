@@ -20,8 +20,9 @@
     <string name="empty_state_title">No Assignments Found</string>
     <string name="empty_state_subtitle">Tap + Add Assignment to create a new task and stay organized!</string>
 
-    <!-- Add Assignment Screen Strings -->
+    <!-- Add / Edit Assignment Screen Strings -->
     <string name="title_add_assignment">Add New Assignment</string>
+    <string name="title_edit_assignment">Edit Assignment</string>
     <string name="label_title">Assignment Title *</string>
     <string name="hint_title">e.g., Data Structures Lab Report</string>
     <string name="label_subject">Subject / Course *</string>
@@ -38,13 +39,20 @@
     <string name="priority_low">Low</string>
 
     <string name="btn_save_assignment">Save Assignment</string>
+    <string name="btn_update_assignment">Update Assignment</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="btn_delete">Delete</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_delete_title">Delete Assignment</string>
+    <string name="dialog_delete_message">Are you sure you want to delete \"%1$s\"? This action cannot be undone.</string>
 
     <!-- Validation & Toasts -->
     <string name="error_title_required">Title is required</string>
     <string name="error_subject_required">Subject is required</string>
     <string name="error_date_required">Please select a due date</string>
     <string name="toast_assignment_saved">Assignment saved successfully! ✨</string>
+    <string name="toast_assignment_updated">Assignment updated successfully! ✨</string>
     <string name="toast_assignment_save_failed">Failed to save assignment. Please try again.</string>
     <string name="toast_status_updated">Assignment status updated</string>
     <string name="toast_assignment_deleted">Assignment deleted</string>

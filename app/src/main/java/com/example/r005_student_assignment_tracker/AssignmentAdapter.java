@@ -24,6 +24,7 @@ public class AssignmentAdapter extends RecyclerView.Adapter<AssignmentAdapter.Vi
     public interface OnAssignmentActionListener {
         void onStatusToggle(Assignment assignment);
         void onDeleteClick(Assignment assignment);
+        void onEditClick(Assignment assignment);
     }
 
     private final Context context;
@@ -107,6 +108,12 @@ public class AssignmentAdapter extends RecyclerView.Adapter<AssignmentAdapter.Vi
         holder.btnDelete.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onDeleteClick(assignment);
+            }
+        });
+
+        holder.cardAssignment.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onEditClick(assignment);
             }
         });
     }
