@@ -64,6 +64,11 @@ public class AssignmentAdapter extends RecyclerView.Adapter<AssignmentAdapter.Vi
 
         holder.tvDueDate.setText(context.getString(R.string.label_due_date_format, assignment.getDueDate()));
 
+        if (holder.ivReminderIndicator != null) {
+            boolean hasActiveReminder = assignment.getReminderTimeMillis() > System.currentTimeMillis() && !assignment.isCompleted();
+            holder.ivReminderIndicator.setVisibility(hasActiveReminder ? View.VISIBLE : View.GONE);
+        }
+
         // Priority styling
         String priority = assignment.getPriority();
         if ("High".equalsIgnoreCase(priority)) {
@@ -128,6 +133,7 @@ public class AssignmentAdapter extends RecyclerView.Adapter<AssignmentAdapter.Vi
         TextView tvSubjectTag, tvPriorityBadge, tvTitle, tvDescription, tvDueDate;
         Chip chipStatus;
         ImageButton btnDelete;
+        android.widget.ImageView ivReminderIndicator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -139,6 +145,7 @@ public class AssignmentAdapter extends RecyclerView.Adapter<AssignmentAdapter.Vi
             tvDueDate = itemView.findViewById(R.id.tvDueDate);
             chipStatus = itemView.findViewById(R.id.chipStatus);
             btnDelete = itemView.findViewById(R.id.btnDelete);
+            ivReminderIndicator = itemView.findViewById(R.id.ivReminderIndicator);
         }
     }
 }

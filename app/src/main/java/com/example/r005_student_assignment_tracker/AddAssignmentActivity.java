@@ -1,6 +1,9 @@
 package com.example.r005_student_assignment_tracker;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,7 +13,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -21,6 +27,8 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -33,20 +41,25 @@ public class AddAssignmentActivity extends AppCompatActivity {
     public static final String EXTRA_ASSIGNMENT = "extra_assignment";
 
     private TextView tvHeaderTitle;
-    private TextInputLayout tilTitle, tilSubject, tilDueDate;
-    private TextInputEditText etTitle, etDescription, etDueDate;
+    private TextInputLayout tilTitle, tilSubject, tilDueDate, tilReminderDate;
+    private TextInputEditText etTitle, etDescription, etDueDate, etReminderDate;
     private MaterialAutoCompleteTextView etSubject;
     private ChipGroup chipGroupPriority;
     private MaterialButton btnSaveAssignment, btnCancel;
     private ImageButton ibBack;
 
     private long selectedDueDateMillis = 0;
+    private long selectedReminderTimeMillis = 0;
+
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
+    private final SimpleDateFormat reminderFormat = new SimpleDateFormat("MMM dd, yyyy, hh:mm a", Locale.US);
 
     private AssignmentRepository repository;
 
     private Assignment existingAssignment;
     private boolean isEditMode = false;
+
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +75,32 @@ public class AddAssignmentActivity extends AppCompatActivity {
 
         repository = new AssignmentRepository(this);
 
+        setupPermissionLauncher();
         initViews();
         setupSubjectDropdown();
         setupDatePicker();
+        setupReminderPicker();
         setupListeners();
         checkEditMode();
+    }
+
+    private void setupPermissionLauncher() {
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (!isGranted) {
+                        Toast.makeText(this, "Notification permission denied. Reminders will not trigger notifications.", Toast.LENGTH_LONG).show();
+                    }
+                }
+        );
+    }
+
+    private void checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     private void initViews() {
@@ -75,11 +109,13 @@ public class AddAssignmentActivity extends AppCompatActivity {
         tilTitle = findViewById(R.id.tilTitle);
         tilSubject = findViewById(R.id.tilSubject);
         tilDueDate = findViewById(R.id.tilDueDate);
+        tilReminderDate = findViewById(R.id.tilReminderDate);
 
         etTitle = findViewById(R.id.etTitle);
         etSubject = findViewById(R.id.etSubject);
         etDescription = findViewById(R.id.etDescription);
         etDueDate = findViewById(R.id.etDueDate);
+        etReminderDate = findViewById(R.id.etReminderDate);
 
         chipGroupPriority = findViewById(R.id.chipGroupPriority);
         btnSaveAssignment = findViewById(R.id.btnSaveAssignment);
@@ -94,12 +130,13 @@ public class AddAssignmentActivity extends AppCompatActivity {
 
     private void checkEditMode() {
         if (getIntent() != null && getIntent().hasExtra(EXTRA_ASSIGNMENT)) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 existingAssignment = getIntent().getSerializableExtra(EXTRA_ASSIGNMENT, Assignment.class);
             } else {
                 //noinspection deprecation
                 existingAssignment = (Assignment) getIntent().getSerializableExtra(EXTRA_ASSIGNMENT);
             }
+
             if (existingAssignment != null) {
                 isEditMode = true;
 
@@ -114,6 +151,11 @@ public class AddAssignmentActivity extends AppCompatActivity {
 
                 selectedDueDateMillis = existingAssignment.getDueDateMillis();
                 etDueDate.setText(existingAssignment.getDueDate());
+
+                selectedReminderTimeMillis = existingAssignment.getReminderTimeMillis();
+                if (selectedReminderTimeMillis > 0) {
+                    etReminderDate.setText(reminderFormat.format(new Date(selectedReminderTimeMillis)));
+                }
 
                 String priority = existingAssignment.getPriority();
                 if ("High".equalsIgnoreCase(priority)) {
@@ -158,7 +200,6 @@ public class AddAssignmentActivity extends AppCompatActivity {
 
         datePicker.addOnPositiveButtonClickListener(selection -> {
             if (selection != null) {
-                // Adjust UTC selection to local date timezone
                 Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
                 calendar.setTimeInMillis(selection);
                 selectedDueDateMillis = selection;
@@ -167,7 +208,71 @@ public class AddAssignmentActivity extends AppCompatActivity {
             }
         });
 
-        datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
+        datePicker.show(getSupportFragmentManager(), "DUE_DATE_PICKER");
+    }
+
+    private void setupReminderPicker() {
+        etReminderDate.setOnClickListener(v -> showReminderDateTimePicker());
+        tilReminderDate.setEndIconOnClickListener(v -> showReminderDateTimePicker());
+    }
+
+    private void showReminderDateTimePicker() {
+        checkNotificationPermission();
+
+        long initialSelection = selectedReminderTimeMillis > System.currentTimeMillis()
+                ? selectedReminderTimeMillis
+                : MaterialDatePicker.todayInUtcMilliseconds();
+
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select Reminder Date")
+                .setSelection(initialSelection)
+                .build();
+
+        datePicker.addOnPositiveButtonClickListener(dateSelection -> {
+            if (dateSelection != null) {
+                Calendar selectedCal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                selectedCal.setTimeInMillis(dateSelection);
+
+                int year = selectedCal.get(Calendar.YEAR);
+                int month = selectedCal.get(Calendar.MONTH);
+                int day = selectedCal.get(Calendar.DAY_OF_MONTH);
+
+                Calendar now = Calendar.getInstance();
+
+                MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                        .setTimeFormat(TimeFormat.CLOCK_12H)
+                        .setHour(now.get(Calendar.HOUR_OF_DAY))
+                        .setMinute(now.get(Calendar.MINUTE))
+                        .setTitleText("Select Reminder Time")
+                        .build();
+
+                timePicker.addOnPositiveButtonClickListener(v -> {
+                    Calendar finalCal = Calendar.getInstance();
+                    finalCal.set(Calendar.YEAR, year);
+                    finalCal.set(Calendar.MONTH, month);
+                    finalCal.set(Calendar.DAY_OF_MONTH, day);
+                    finalCal.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+                    finalCal.set(Calendar.MINUTE, timePicker.getMinute());
+                    finalCal.set(Calendar.SECOND, 0);
+                    finalCal.set(Calendar.MILLISECOND, 0);
+
+                    long reminderTime = finalCal.getTimeInMillis();
+                    if (reminderTime <= System.currentTimeMillis()) {
+                        tilReminderDate.setError(getString(R.string.error_reminder_past));
+                        selectedReminderTimeMillis = 0;
+                        etReminderDate.setText("");
+                    } else {
+                        selectedReminderTimeMillis = reminderTime;
+                        tilReminderDate.setError(null);
+                        etReminderDate.setText(reminderFormat.format(finalCal.getTime()));
+                    }
+                });
+
+                timePicker.show(getSupportFragmentManager(), "REMINDER_TIME_PICKER");
+            }
+        });
+
+        datePicker.show(getSupportFragmentManager(), "REMINDER_DATE_PICKER");
     }
 
     private void setupListeners() {
@@ -222,6 +327,11 @@ public class AddAssignmentActivity extends AppCompatActivity {
             isValid = false;
         }
 
+        if (selectedReminderTimeMillis > 0 && selectedReminderTimeMillis <= System.currentTimeMillis()) {
+            tilReminderDate.setError(getString(R.string.error_reminder_past));
+            isValid = false;
+        }
+
         if (!isValid) return;
 
         // Determine Priority from chip selection
@@ -240,9 +350,12 @@ public class AddAssignmentActivity extends AppCompatActivity {
             existingAssignment.setDueDate(dueDateStr);
             existingAssignment.setDueDateMillis(selectedDueDateMillis);
             existingAssignment.setPriority(priority);
+            existingAssignment.setReminderTimeMillis(selectedReminderTimeMillis);
 
             boolean success = repository.updateAssignment(existingAssignment);
             if (success) {
+                ReminderManager.scheduleReminder(this, existingAssignment);
+
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra(EXTRA_ASSIGNMENT, existingAssignment);
                 setResult(RESULT_OK, resultIntent);
@@ -254,9 +367,13 @@ public class AddAssignmentActivity extends AppCompatActivity {
             }
         } else {
             Assignment newAssignment = new Assignment(title, subject, description, dueDateStr, selectedDueDateMillis, priority);
+            newAssignment.setReminderTimeMillis(selectedReminderTimeMillis);
+
             boolean success = repository.addAssignment(newAssignment);
 
             if (success) {
+                ReminderManager.scheduleReminder(this, newAssignment);
+
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra(EXTRA_ASSIGNMENT, newAssignment);
                 setResult(RESULT_OK, resultIntent);

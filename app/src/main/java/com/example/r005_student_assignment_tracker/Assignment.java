@@ -15,11 +15,13 @@ public class Assignment implements Serializable {
     private long dueDateMillis;
     private String priority; // High, Medium, Low
     private boolean isCompleted;
+    private long reminderTimeMillis;
 
     public Assignment() {
         this.id = UUID.randomUUID().toString();
         this.isCompleted = false;
         this.priority = "Medium";
+        this.reminderTimeMillis = 0;
     }
 
     public Assignment(String title, String subject, String description, String dueDate, long dueDateMillis, String priority) {
@@ -31,6 +33,7 @@ public class Assignment implements Serializable {
         this.dueDateMillis = dueDateMillis;
         this.priority = priority;
         this.isCompleted = false;
+        this.reminderTimeMillis = 0;
     }
 
     public String getId() {
@@ -97,6 +100,14 @@ public class Assignment implements Serializable {
         isCompleted = completed;
     }
 
+    public long getReminderTimeMillis() {
+        return reminderTimeMillis;
+    }
+
+    public void setReminderTimeMillis(long reminderTimeMillis) {
+        this.reminderTimeMillis = reminderTimeMillis;
+    }
+
     public JSONObject toJSONObject() throws JSONException {
         JSONObject obj = new JSONObject();
         obj.put("id", id);
@@ -107,6 +118,7 @@ public class Assignment implements Serializable {
         obj.put("dueDateMillis", dueDateMillis);
         obj.put("priority", priority);
         obj.put("isCompleted", isCompleted);
+        obj.put("reminderTimeMillis", reminderTimeMillis);
         return obj;
     }
 
@@ -120,6 +132,7 @@ public class Assignment implements Serializable {
         assignment.setDueDateMillis(obj.optLong("dueDateMillis", 0));
         assignment.setPriority(obj.optString("priority", "Medium"));
         assignment.setCompleted(obj.optBoolean("isCompleted", false));
+        assignment.setReminderTimeMillis(obj.optLong("reminderTimeMillis", 0));
         return assignment;
     }
 }

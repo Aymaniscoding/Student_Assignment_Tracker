@@ -1,6 +1,9 @@
 package com.example.r005_student_assignment_tracker;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,6 +16,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
     private AssignmentRepository repository;
     private AssignmentAdapter adapter;
     private ActivityResultLauncher<Intent> addAssignmentLauncher;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     private String currentFilter = "All";
     private String currentSearchQuery = "";
@@ -58,12 +63,32 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
 
         repository = new AssignmentRepository(this);
 
+        setupPermissionLauncher();
+        checkNotificationPermission();
+
         initViews();
         setupSearch();
         setupRecyclerView();
         setupFilterChips();
         setupActivityLauncher();
         setupFab();
+    }
+
+    private void setupPermissionLauncher() {
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    // Permission result
+                }
+        );
+    }
+
+    private void checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     @Override
@@ -216,6 +241,14 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
     @Override
     public void onStatusToggle(Assignment assignment) {
         repository.toggleCompletion(assignment.getId());
+        Assignment updated = repository.getAssignmentById(assignment.getId());
+        if (updated != null) {
+            if (updated.isCompleted()) {
+                ReminderManager.cancelReminder(this, updated.getId());
+            } else {
+                ReminderManager.scheduleReminder(this, updated);
+            }
+        }
         loadDashboardData();
         Toast.makeText(this, R.string.toast_status_updated, Toast.LENGTH_SHORT).show();
     }
@@ -226,6 +259,7 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
                 .setTitle(R.string.dialog_delete_title)
                 .setMessage(getString(R.string.dialog_delete_message, assignment.getTitle()))
                 .setPositiveButton(R.string.btn_delete, (dialog, which) -> {
+                    ReminderManager.cancelReminder(this, assignment.getId());
                     repository.deleteAssignment(assignment.getId());
                     loadDashboardData();
                     Toast.makeText(this, R.string.toast_assignment_deleted, Toast.LENGTH_SHORT).show();

@@ -15,6 +15,10 @@ public class AssignmentRepository {
         return dbHelper.getAllAssignments();
     }
 
+    public Assignment getAssignmentById(String id) {
+        return dbHelper.getAssignmentById(id);
+    }
+
     public boolean addAssignment(Assignment assignment) {
         return dbHelper.insertAssignment(assignment);
     }

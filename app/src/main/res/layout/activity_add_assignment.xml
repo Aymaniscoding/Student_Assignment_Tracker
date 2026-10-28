@@ -151,6 +151,32 @@
                         android:textSize="15sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Reminder Notification Date/Time Picker -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilReminderDate"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/label_reminder"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:endIconDrawable="@drawable/ic_clock"
+                    app:endIconMode="custom"
+                    app:endIconTint="@color/primary_indigo"
+                    app:helperText="Optional date &amp; time for notification">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etReminderDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:inputType="none"
+                        android:textSize="15sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <!-- Priority Selection Header -->
                 <TextView
                     android:layout_width="wrap_content"

@@ -13,7 +13,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "CampusFlow.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public static final String TABLE_ASSIGNMENTS = "assignments";
 
@@ -25,6 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DUE_DATE_MILLIS = "due_date_millis";
     public static final String COLUMN_PRIORITY = "priority";
     public static final String COLUMN_IS_COMPLETED = "is_completed";
+    public static final String COLUMN_REMINDER_TIME_MILLIS = "reminder_time_millis";
 
     private static final String CREATE_TABLE_ASSIGNMENTS = "CREATE TABLE " + TABLE_ASSIGNMENTS + " ("
             + COLUMN_ID + " TEXT PRIMARY KEY, "
@@ -34,7 +35,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_DUE_DATE + " TEXT NOT NULL, "
             + COLUMN_DUE_DATE_MILLIS + " INTEGER, "
             + COLUMN_PRIORITY + " TEXT NOT NULL, "
-            + COLUMN_IS_COMPLETED + " INTEGER DEFAULT 0"
+            + COLUMN_IS_COMPLETED + " INTEGER DEFAULT 0, "
+            + COLUMN_REMINDER_TIME_MILLIS + " INTEGER DEFAULT 0"
             + ");";
 
     public DatabaseHelper(Context context) {
@@ -49,8 +51,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ASSIGNMENTS);
-        onCreate(db);
+        if (oldVersion < 2) {
+            db.execSQL("ALTER TABLE " + TABLE_ASSIGNMENTS + " ADD COLUMN " + COLUMN_REMINDER_TIME_MILLIS + " INTEGER DEFAULT 0;");
+        }
     }
 
     public boolean insertAssignment(Assignment assignment) {
@@ -64,6 +67,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_DUE_DATE_MILLIS, assignment.getDueDateMillis());
         values.put(COLUMN_PRIORITY, assignment.getPriority());
         values.put(COLUMN_IS_COMPLETED, assignment.isCompleted() ? 1 : 0);
+        values.put(COLUMN_REMINDER_TIME_MILLIS, assignment.getReminderTimeMillis());
 
         long result = db.insert(TABLE_ASSIGNMENTS, null, values);
         return result != -1;
@@ -77,22 +81,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                Assignment assignment = new Assignment();
-                assignment.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID)));
-                assignment.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)));
-                assignment.setSubject(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SUBJECT)));
-                assignment.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION)));
-                assignment.setDueDate(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DUE_DATE)));
-                assignment.setDueDateMillis(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_DUE_DATE_MILLIS)));
-                assignment.setPriority(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRIORITY)));
-                assignment.setCompleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_COMPLETED)) == 1);
-
+                Assignment assignment = cursorToAssignment(cursor);
                 assignmentList.add(assignment);
             } while (cursor.moveToNext());
             cursor.close();
         }
 
         return assignmentList;
+    }
+
+    public Assignment getAssignmentById(String id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_ASSIGNMENTS, null, COLUMN_ID + " = ?", new String[]{id}, null, null, null);
+        Assignment assignment = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            assignment = cursorToAssignment(cursor);
+            cursor.close();
+        }
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+        return assignment;
     }
 
     public boolean updateAssignment(Assignment assignment) {
@@ -105,6 +114,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_DUE_DATE_MILLIS, assignment.getDueDateMillis());
         values.put(COLUMN_PRIORITY, assignment.getPriority());
         values.put(COLUMN_IS_COMPLETED, assignment.isCompleted() ? 1 : 0);
+        values.put(COLUMN_REMINDER_TIME_MILLIS, assignment.getReminderTimeMillis());
 
         int rows = db.update(TABLE_ASSIGNMENTS, values, COLUMN_ID + " = ?", new String[]{assignment.getId()});
         return rows > 0;
@@ -131,6 +141,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         if (cursor != null) cursor.close();
         return false;
+    }
+
+    private Assignment cursorToAssignment(Cursor cursor) {
+        Assignment assignment = new Assignment();
+        assignment.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID)));
+        assignment.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)));
+        assignment.setSubject(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SUBJECT)));
+        assignment.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION)));
+        assignment.setDueDate(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DUE_DATE)));
+        assignment.setDueDateMillis(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_DUE_DATE_MILLIS)));
+        assignment.setPriority(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRIORITY)));
+        assignment.setCompleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_COMPLETED)) == 1);
+        int reminderIndex = cursor.getColumnIndex(COLUMN_REMINDER_TIME_MILLIS);
+        if (reminderIndex != -1) {
+            assignment.setReminderTimeMillis(cursor.getLong(reminderIndex));
+        }
+        return assignment;
     }
 
     private void insertSampleData(SQLiteDatabase db) {
@@ -189,6 +216,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_DUE_DATE_MILLIS, assignment.getDueDateMillis());
         values.put(COLUMN_PRIORITY, assignment.getPriority());
         values.put(COLUMN_IS_COMPLETED, assignment.isCompleted() ? 1 : 0);
+        values.put(COLUMN_REMINDER_TIME_MILLIS, assignment.getReminderTimeMillis());
         db.insert(TABLE_ASSIGNMENTS, null, values);
     }
 }

@@ -116,6 +116,16 @@
                     android:textColor="@color/text_muted"
                     android:textSize="12sp"
                     android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivReminderIndicator"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@string/label_reminder"
+                    android:src="@drawable/ic_bell"
+                    android:visibility="gone"
+                    app:tint="@color/primary_indigo" />
             </LinearLayout>
 
             <LinearLayout

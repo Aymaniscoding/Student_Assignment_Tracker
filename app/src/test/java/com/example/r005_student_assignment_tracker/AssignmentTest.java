@@ -28,6 +28,7 @@ public class AssignmentTest {
         assertEquals(1700000000000L, assignment.getDueDateMillis());
         assertEquals("High", assignment.getPriority());
         assertFalse(assignment.isCompleted());
+        assertEquals(0L, assignment.getReminderTimeMillis());
     }
 
     @Test
@@ -41,6 +42,7 @@ public class AssignmentTest {
         assignment.setDueDateMillis(1700100000000L);
         assignment.setPriority("Medium");
         assignment.setCompleted(true);
+        assignment.setReminderTimeMillis(1700050000000L);
 
         assertEquals("test-id-123", assignment.getId());
         assertEquals("Calculus Quiz", assignment.getTitle());
@@ -50,6 +52,7 @@ public class AssignmentTest {
         assertEquals(1700100000000L, assignment.getDueDateMillis());
         assertEquals("Medium", assignment.getPriority());
         assertTrue(assignment.isCompleted());
+        assertEquals(1700050000000L, assignment.getReminderTimeMillis());
     }
 
     @Test
