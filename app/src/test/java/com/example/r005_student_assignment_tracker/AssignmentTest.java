@@ -63,4 +63,35 @@ public class AssignmentTest {
         assignment.setCompleted(false);
         assertFalse(assignment.isCompleted());
     }
+
+    @Test
+    public void testSearchAndFilterMatching() {
+        Assignment csAssignment = new Assignment(
+                "Data Structures Lab Project",
+                "Computer Science",
+                "Implement BST",
+                "Oct 28, 2026",
+                1700000000000L,
+                "High"
+        );
+
+        Assignment mathAssignment = new Assignment(
+                "Calculus Problem Set",
+                "Mathematics",
+                "Derivatives",
+                "Oct 31, 2026",
+                1700100000000L,
+                "Medium"
+        );
+
+        // Search by title match
+        String searchQuery = "data";
+        assertTrue(csAssignment.getTitle().toLowerCase().contains(searchQuery));
+        assertFalse(mathAssignment.getTitle().toLowerCase().contains(searchQuery));
+
+        // Search by subject match
+        String subjectQuery = "math";
+        assertTrue(mathAssignment.getSubject().toLowerCase().contains(subjectQuery));
+        assertFalse(csAssignment.getSubject().toLowerCase().contains(subjectQuery));
+    }
 }

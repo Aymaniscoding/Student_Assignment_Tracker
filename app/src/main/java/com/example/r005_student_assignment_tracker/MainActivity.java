@@ -2,6 +2,8 @@ package com.example.r005_student_assignment_tracker;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
 
     private TextView tvStatTotal, tvStatPending, tvStatCompleted, tvStatHighPriority;
     private TextView tvCountBadge;
+    private TextInputEditText etSearch;
     private ChipGroup chipGroupFilter;
     private RecyclerView rvAssignments;
     private LinearLayout layoutEmptyState;
@@ -38,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
     private ActivityResultLauncher<Intent> addAssignmentLauncher;
 
     private String currentFilter = "All";
+    private String currentSearchQuery = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
         repository = new AssignmentRepository(this);
 
         initViews();
+        setupSearch();
         setupRecyclerView();
         setupFilterChips();
         setupActivityLauncher();
@@ -73,10 +79,29 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
         tvStatHighPriority = findViewById(R.id.tvStatHighPriority);
 
         tvCountBadge = findViewById(R.id.tvCountBadge);
+        etSearch = findViewById(R.id.etSearch);
         chipGroupFilter = findViewById(R.id.chipGroupFilter);
         rvAssignments = findViewById(R.id.rvAssignments);
         layoutEmptyState = findViewById(R.id.layoutEmptyState);
         fabAddAssignment = findViewById(R.id.fabAddAssignment);
+    }
+
+    private void setupSearch() {
+        if (etSearch != null) {
+            etSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    currentSearchQuery = s != null ? s.toString().trim().toLowerCase() : "";
+                    loadDashboardData();
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+        }
     }
 
     private void setupRecyclerView() {
@@ -141,7 +166,12 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
                 highPriorityCount++;
             }
 
-            // Apply filter
+            // Check Search Query (Title or Subject)
+            boolean matchesSearch = currentSearchQuery.isEmpty()
+                    || (assignment.getTitle() != null && assignment.getTitle().toLowerCase().contains(currentSearchQuery))
+                    || (assignment.getSubject() != null && assignment.getSubject().toLowerCase().contains(currentSearchQuery));
+
+            // Check Filter Choice
             boolean matchesFilter = false;
             switch (currentFilter) {
                 case "Pending":
@@ -159,12 +189,12 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
                     break;
             }
 
-            if (matchesFilter) {
+            if (matchesSearch && matchesFilter) {
                 filteredList.add(assignment);
             }
         }
 
-        // Update Stat Cards
+        // Update Stat Cards with actual database counts
         tvStatTotal.setText(String.valueOf(totalCount));
         tvStatPending.setText(String.valueOf(pendingCount));
         tvStatCompleted.setText(String.valueOf(completedCount));

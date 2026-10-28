@@ -11,6 +11,7 @@
     <string name="stat_high_priority">High Priority</string>
 
     <string name="section_upcoming_assignments">Upcoming Assignments</string>
+    <string name="hint_search">Search by title or subject&#8230;</string>
     <string name="filter_all">All</string>
     <string name="filter_pending">Pending</string>
     <string name="filter_completed">Completed</string>
