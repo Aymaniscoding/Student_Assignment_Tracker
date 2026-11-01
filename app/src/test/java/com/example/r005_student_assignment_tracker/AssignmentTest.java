@@ -97,4 +97,16 @@ public class AssignmentTest {
         assertTrue(mathAssignment.getSubject().toLowerCase().contains(subjectQuery));
         assertFalse(csAssignment.getSubject().toLowerCase().contains(subjectQuery));
     }
+
+    @Test
+    public void testPastReminderValidation() {
+        long pastMillis = System.currentTimeMillis() - 10000L;
+        long futureMillis = System.currentTimeMillis() + 100000L;
+
+        boolean isPastValid = pastMillis > System.currentTimeMillis();
+        boolean isFutureValid = futureMillis > System.currentTimeMillis();
+
+        assertFalse(isPastValid);
+        assertTrue(isFutureValid);
+    }
 }

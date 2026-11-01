@@ -16,10 +16,13 @@
     <string name="filter_pending">Pending</string>
     <string name="filter_completed">Completed</string>
     <string name="filter_high_priority">High Priority</string>
-
     <string name="btn_add_assignment">Add Assignment</string>
+
+    <!-- Empty States -->
     <string name="empty_state_title">No Assignments Found</string>
     <string name="empty_state_subtitle">Tap + Add Assignment to create a new task and stay organized!</string>
+    <string name="empty_search_title">No Matching Assignments</string>
+    <string name="empty_search_subtitle">Try searching with a different keyword or changing the filter.</string>
 
     <!-- Add / Edit Assignment Screen Strings -->
     <string name="title_add_assignment">Add New Assignment</string>
@@ -52,6 +55,8 @@
 
     <!-- Validation & Toasts -->
     <string name="error_title_required">Title is required</string>
+    <string name="error_title_min_length">Title must be at least 2 characters long</string>
+    <string name="error_duplicate_title">An assignment with this title already exists</string>
     <string name="error_subject_required">Subject is required</string>
     <string name="error_date_required">Please select a due date</string>
     <string name="error_reminder_past">Reminder time must be in the future</string>

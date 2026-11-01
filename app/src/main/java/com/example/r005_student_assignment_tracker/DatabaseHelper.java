@@ -77,31 +77,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<Assignment> assignmentList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_ASSIGNMENTS, null, null, null, null, null, COLUMN_DUE_DATE_MILLIS + " ASC");
-
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                Assignment assignment = cursorToAssignment(cursor);
-                assignmentList.add(assignment);
-            } while (cursor.moveToNext());
-            cursor.close();
+        try (Cursor cursor = db.query(TABLE_ASSIGNMENTS, null, null, null, null, null, COLUMN_DUE_DATE_MILLIS + " ASC")) {
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    assignmentList.add(cursorToAssignment(cursor));
+                } while (cursor.moveToNext());
+            }
         }
-
         return assignmentList;
     }
 
     public Assignment getAssignmentById(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_ASSIGNMENTS, null, COLUMN_ID + " = ?", new String[]{id}, null, null, null);
-        Assignment assignment = null;
-        if (cursor != null && cursor.moveToFirst()) {
-            assignment = cursorToAssignment(cursor);
-            cursor.close();
+        try (Cursor cursor = db.query(TABLE_ASSIGNMENTS, null, COLUMN_ID + " = ?", new String[]{id}, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                return cursorToAssignment(cursor);
+            }
         }
-        if (cursor != null && !cursor.isClosed()) {
-            cursor.close();
+        return null;
+    }
+
+    public boolean isDuplicateTitle(String title, String excludeId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selection;
+        String[] selectionArgs;
+
+        if (excludeId != null && !excludeId.isEmpty()) {
+            selection = "LOWER(" + COLUMN_TITLE + ") = LOWER(?) AND " + COLUMN_ID + " != ?";
+            selectionArgs = new String[]{title.trim(), excludeId};
+        } else {
+            selection = "LOWER(" + COLUMN_TITLE + ") = LOWER(?)";
+            selectionArgs = new String[]{title.trim()};
         }
-        return assignment;
+
+        try (Cursor cursor = db.query(TABLE_ASSIGNMENTS, new String[]{COLUMN_ID}, selection, selectionArgs, null, null, null)) {
+            return cursor != null && cursor.getCount() > 0;
+        }
     }
 
     public boolean updateAssignment(Assignment assignment) {
@@ -128,18 +139,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean toggleCompletion(String id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.query(TABLE_ASSIGNMENTS, new String[]{COLUMN_IS_COMPLETED}, COLUMN_ID + " = ?", new String[]{id}, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int currentStatus = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_COMPLETED));
-            int newStatus = (currentStatus == 1) ? 0 : 1;
-            cursor.close();
+        try (Cursor cursor = db.query(TABLE_ASSIGNMENTS, new String[]{COLUMN_IS_COMPLETED}, COLUMN_ID + " = ?", new String[]{id}, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int currentStatus = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_COMPLETED));
+                int newStatus = (currentStatus == 1) ? 0 : 1;
 
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_IS_COMPLETED, newStatus);
-            int rows = db.update(TABLE_ASSIGNMENTS, values, COLUMN_ID + " = ?", new String[]{id});
-            return rows > 0;
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_IS_COMPLETED, newStatus);
+                int rows = db.update(TABLE_ASSIGNMENTS, values, COLUMN_ID + " = ?", new String[]{id});
+                return rows > 0;
+            }
         }
-        if (cursor != null) cursor.close();
         return false;
     }
 
@@ -153,6 +163,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         assignment.setDueDateMillis(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_DUE_DATE_MILLIS)));
         assignment.setPriority(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRIORITY)));
         assignment.setCompleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_COMPLETED)) == 1);
+
         int reminderIndex = cursor.getColumnIndex(COLUMN_REMINDER_TIME_MILLIS);
         if (reminderIndex != -1) {
             assignment.setReminderTimeMillis(cursor.getLong(reminderIndex));

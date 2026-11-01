@@ -315,6 +315,12 @@ public class AddAssignmentActivity extends AppCompatActivity {
         if (title.isEmpty()) {
             tilTitle.setError(getString(R.string.error_title_required));
             isValid = false;
+        } else if (title.length() < 2) {
+            tilTitle.setError(getString(R.string.error_title_min_length));
+            isValid = false;
+        } else if (repository.isDuplicateTitle(title, isEditMode && existingAssignment != null ? existingAssignment.getId() : null)) {
+            tilTitle.setError(getString(R.string.error_duplicate_title));
+            isValid = false;
         }
 
         if (subject.isEmpty()) {

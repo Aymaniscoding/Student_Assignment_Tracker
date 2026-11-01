@@ -19,6 +19,10 @@ public class AssignmentRepository {
         return dbHelper.getAssignmentById(id);
     }
 
+    public boolean isDuplicateTitle(String title, String excludeId) {
+        return dbHelper.isDuplicateTitle(title, excludeId);
+    }
+
     public boolean addAssignment(Assignment assignment) {
         return dbHelper.insertAssignment(assignment);
     }

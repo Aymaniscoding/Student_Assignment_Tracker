@@ -231,6 +231,19 @@ public class MainActivity extends AppCompatActivity implements AssignmentAdapter
         if (filteredList.isEmpty()) {
             rvAssignments.setVisibility(View.GONE);
             layoutEmptyState.setVisibility(View.VISIBLE);
+
+            TextView tvEmptyTitle = findViewById(R.id.tvEmptyTitle);
+            TextView tvEmptySubtitle = findViewById(R.id.tvEmptySubtitle);
+
+            if (tvEmptyTitle != null && tvEmptySubtitle != null) {
+                if (!currentSearchQuery.isEmpty() || !"All".equalsIgnoreCase(currentFilter)) {
+                    tvEmptyTitle.setText(R.string.empty_search_title);
+                    tvEmptySubtitle.setText(R.string.empty_search_subtitle);
+                } else {
+                    tvEmptyTitle.setText(R.string.empty_state_title);
+                    tvEmptySubtitle.setText(R.string.empty_state_subtitle);
+                }
+            }
         } else {
             rvAssignments.setVisibility(View.VISIBLE);
             layoutEmptyState.setVisibility(View.GONE);
