@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public class Assignment implements Serializable {
     private String id;
+    private String userId;
     private String title;
     private String subject;
     private String description;
@@ -16,16 +17,22 @@ public class Assignment implements Serializable {
     private String priority; // High, Medium, Low
     private boolean isCompleted;
     private long reminderTimeMillis;
+    private String submissionNotes;
+    private long submissionTimeMillis;
 
     public Assignment() {
         this.id = UUID.randomUUID().toString();
+        this.userId = "";
         this.isCompleted = false;
         this.priority = "Medium";
         this.reminderTimeMillis = 0;
+        this.submissionNotes = "";
+        this.submissionTimeMillis = 0;
     }
 
     public Assignment(String title, String subject, String description, String dueDate, long dueDateMillis, String priority) {
         this.id = UUID.randomUUID().toString();
+        this.userId = "";
         this.title = title;
         this.subject = subject;
         this.description = description;
@@ -34,6 +41,8 @@ public class Assignment implements Serializable {
         this.priority = priority;
         this.isCompleted = false;
         this.reminderTimeMillis = 0;
+        this.submissionNotes = "";
+        this.submissionTimeMillis = 0;
     }
 
     public String getId() {
@@ -42,6 +51,14 @@ public class Assignment implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getTitle() {
@@ -85,7 +102,20 @@ public class Assignment implements Serializable {
     }
 
     public String getPriority() {
-        return priority;
+        if (dueDateMillis <= 0) {
+            return priority != null && !priority.isEmpty() ? priority : "Medium";
+        }
+        long now = System.currentTimeMillis();
+        long diffMillis = dueDateMillis - now;
+        long diffDays = diffMillis / (1000 * 60 * 60 * 24);
+
+        if (diffMillis <= 0 || diffDays <= 1) {
+            return "High"; // Due today, tomorrow, or overdue
+        } else if (diffDays <= 5) {
+            return "Medium"; // Due in 2 to 5 days
+        } else {
+            return "Low"; // Due in 6+ days
+        }
     }
 
     public void setPriority(String priority) {
@@ -108,23 +138,43 @@ public class Assignment implements Serializable {
         this.reminderTimeMillis = reminderTimeMillis;
     }
 
+    public String getSubmissionNotes() {
+        return submissionNotes;
+    }
+
+    public void setSubmissionNotes(String submissionNotes) {
+        this.submissionNotes = submissionNotes;
+    }
+
+    public long getSubmissionTimeMillis() {
+        return submissionTimeMillis;
+    }
+
+    public void setSubmissionTimeMillis(long submissionTimeMillis) {
+        this.submissionTimeMillis = submissionTimeMillis;
+    }
+
     public JSONObject toJSONObject() throws JSONException {
         JSONObject obj = new JSONObject();
         obj.put("id", id);
+        obj.put("userId", userId);
         obj.put("title", title);
         obj.put("subject", subject);
         obj.put("description", description);
         obj.put("dueDate", dueDate);
         obj.put("dueDateMillis", dueDateMillis);
-        obj.put("priority", priority);
+        obj.put("priority", getPriority());
         obj.put("isCompleted", isCompleted);
         obj.put("reminderTimeMillis", reminderTimeMillis);
+        obj.put("submissionNotes", submissionNotes);
+        obj.put("submissionTimeMillis", submissionTimeMillis);
         return obj;
     }
 
     public static Assignment fromJSONObject(JSONObject obj) throws JSONException {
         Assignment assignment = new Assignment();
         assignment.setId(obj.optString("id", UUID.randomUUID().toString()));
+        assignment.setUserId(obj.optString("userId", ""));
         assignment.setTitle(obj.optString("title", ""));
         assignment.setSubject(obj.optString("subject", ""));
         assignment.setDescription(obj.optString("description", ""));
@@ -133,6 +183,8 @@ public class Assignment implements Serializable {
         assignment.setPriority(obj.optString("priority", "Medium"));
         assignment.setCompleted(obj.optBoolean("isCompleted", false));
         assignment.setReminderTimeMillis(obj.optLong("reminderTimeMillis", 0));
+        assignment.setSubmissionNotes(obj.optString("submissionNotes", ""));
+        assignment.setSubmissionTimeMillis(obj.optLong("submissionTimeMillis", 0));
         return assignment;
     }
 }

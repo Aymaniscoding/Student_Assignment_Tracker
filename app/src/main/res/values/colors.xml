@@ -3,31 +3,36 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Brand Colors -->
-    <color name="primary_indigo">#4F46E5</color>
-    <color name="primary_indigo_light">#EEF2FF</color>
-    <color name="primary_dark">#3730A3</color>
-    <color name="accent_teal">#0EA5E9</color>
-    <color name="accent_teal_light">#E0F2FE</color>
+    <!-- Classy Green & Obsidian Black Palette -->
+    <color name="primary_indigo">#10B981</color> <!-- Classy Emerald Green -->
+    <color name="primary_indigo_light">#064E3B</color> <!-- Dark Mint Tint -->
+    <color name="primary_dark">#047857</color>
+    <color name="accent_teal">#059669</color>
+    <color name="accent_teal_light">#022C22</color>
+    <color name="accent_violet">#34D399</color>
+    <color name="accent_violet_light">#065F46</color>
 
     <!-- Status Colors -->
     <color name="status_completed">#10B981</color>
-    <color name="status_completed_light">#D1FAE5</color>
+    <color name="status_completed_light">#064E3B</color>
     <color name="status_pending">#F59E0B</color>
-    <color name="status_pending_light">#FEF3C7</color>
+    <color name="status_pending_light">#451A03</color>
 
     <!-- Priority Colors -->
     <color name="priority_high">#EF4444</color>
-    <color name="priority_high_bg">#FEE2E2</color>
+    <color name="priority_high_bg">#4C0519</color>
     <color name="priority_medium">#F59E0B</color>
-    <color name="priority_medium_bg">#FEF3C7</color>
+    <color name="priority_medium_bg">#451A03</color>
     <color name="priority_low">#10B981</color>
-    <color name="priority_low_bg">#D1FAE5</color>
+    <color name="priority_low_bg">#064E3B</color>
 
-    <!-- Text & Neutral Colors -->
-    <color name="bg_light">#F8FAFC</color>
-    <color name="card_border">#E2E8F0</color>
-    <color name="text_primary">#0F172A</color>
-    <color name="text_secondary">#475569</color>
+    <!-- Dark Obsidian & Surface Colors -->
+    <color name="bg_light">#0A0E17</color> <!-- True Dark Obsidian Background -->
+    <color name="surface_dark">#161E2E</color> <!-- Sleek Surface Cards -->
+    <color name="header_black">#0A0E17</color>
+    <color name="header_dark_slate">#1E293B</color>
+    <color name="card_border">#2A364F</color>
+    <color name="text_primary">#F8FAFC</color> <!-- High Contrast White -->
+    <color name="text_secondary">#CBD5E1</color> <!-- Light Slate -->
     <color name="text_muted">#94A3B8</color>
 </resources>

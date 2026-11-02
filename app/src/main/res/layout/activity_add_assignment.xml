@@ -17,7 +17,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="@color/surface_dark"
             android:elevation="2dp"
             android:paddingHorizontal="16dp"
             android:paddingTop="20dp"
@@ -65,6 +65,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/label_title"
+                    app:boxBackgroundColor="@color/surface_dark"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -77,6 +78,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textCapWords"
                         android:maxLines="1"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -88,6 +90,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:hint="@string/label_subject"
+                    app:boxBackgroundColor="@color/surface_dark"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -100,6 +103,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textCapWords"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -111,6 +115,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:hint="@string/label_description"
+                    app:boxBackgroundColor="@color/surface_dark"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -123,6 +128,7 @@
                         android:gravity="top|start"
                         android:inputType="textMultiLine"
                         android:minLines="3"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -134,13 +140,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:hint="@string/label_due_date"
+                    app:boxBackgroundColor="@color/surface_dark"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
                     app:endIconDrawable="@drawable/ic_calendar"
                     app:endIconMode="custom"
-                    app:endIconTint="@color/primary_indigo">
+                    app:endIconTint="@color/primary_indigo"
+                    app:helperText="Priority is automatically assigned based on due date proximity.">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etDueDate"
@@ -148,6 +156,7 @@
                         android:layout_height="wrap_content"
                         android:focusable="false"
                         android:inputType="none"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -159,6 +168,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:hint="@string/label_reminder"
+                    app:boxBackgroundColor="@color/surface_dark"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -174,48 +184,9 @@
                         android:layout_height="wrap_content"
                         android:focusable="false"
                         android:inputType="none"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Priority Selection Header -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="@string/label_priority"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroupPriority"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:singleSelection="true">
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipPriorityHigh"
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/priority_high" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipPriorityMedium"
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true"
-                        android:text="@string/priority_medium" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipPriorityLow"
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/priority_low" />
-                </com.google.android.material.chip.ChipGroup>
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
@@ -224,7 +195,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="@color/surface_dark"
             android:elevation="8dp"
             android:orientation="vertical"
             android:padding="16dp">

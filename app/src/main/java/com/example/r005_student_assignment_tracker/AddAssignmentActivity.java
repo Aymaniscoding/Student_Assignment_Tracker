@@ -22,7 +22,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -44,7 +43,6 @@ public class AddAssignmentActivity extends AppCompatActivity {
     private TextInputLayout tilTitle, tilSubject, tilDueDate, tilReminderDate;
     private TextInputEditText etTitle, etDescription, etDueDate, etReminderDate;
     private MaterialAutoCompleteTextView etSubject;
-    private ChipGroup chipGroupPriority;
     private MaterialButton btnSaveAssignment, btnCancel;
     private ImageButton ibBack;
 
@@ -55,6 +53,7 @@ public class AddAssignmentActivity extends AppCompatActivity {
     private final SimpleDateFormat reminderFormat = new SimpleDateFormat("MMM dd, yyyy, hh:mm a", Locale.US);
 
     private AssignmentRepository repository;
+    private AuthManager authManager;
 
     private Assignment existingAssignment;
     private boolean isEditMode = false;
@@ -74,6 +73,7 @@ public class AddAssignmentActivity extends AppCompatActivity {
         });
 
         repository = new AssignmentRepository(this);
+        authManager = new AuthManager(this);
 
         setupPermissionLauncher();
         initViews();
@@ -117,11 +117,9 @@ public class AddAssignmentActivity extends AppCompatActivity {
         etDueDate = findViewById(R.id.etDueDate);
         etReminderDate = findViewById(R.id.etReminderDate);
 
-        chipGroupPriority = findViewById(R.id.chipGroupPriority);
         btnSaveAssignment = findViewById(R.id.btnSaveAssignment);
         btnCancel = findViewById(R.id.btnCancel);
 
-        // Pre-select default due date as tomorrow
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, 1);
         selectedDueDateMillis = cal.getTimeInMillis();
@@ -155,15 +153,6 @@ public class AddAssignmentActivity extends AppCompatActivity {
                 selectedReminderTimeMillis = existingAssignment.getReminderTimeMillis();
                 if (selectedReminderTimeMillis > 0) {
                     etReminderDate.setText(reminderFormat.format(new Date(selectedReminderTimeMillis)));
-                }
-
-                String priority = existingAssignment.getPriority();
-                if ("High".equalsIgnoreCase(priority)) {
-                    chipGroupPriority.check(R.id.chipPriorityHigh);
-                } else if ("Low".equalsIgnoreCase(priority)) {
-                    chipGroupPriority.check(R.id.chipPriorityLow);
-                } else {
-                    chipGroupPriority.check(R.id.chipPriorityMedium);
                 }
             }
         }
@@ -200,8 +189,6 @@ public class AddAssignmentActivity extends AppCompatActivity {
 
         datePicker.addOnPositiveButtonClickListener(selection -> {
             if (selection != null) {
-                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                calendar.setTimeInMillis(selection);
                 selectedDueDateMillis = selection;
                 etDueDate.setText(dateFormat.format(new Date(selection)));
                 tilDueDate.setError(null);
@@ -318,7 +305,7 @@ public class AddAssignmentActivity extends AppCompatActivity {
         } else if (title.length() < 2) {
             tilTitle.setError(getString(R.string.error_title_min_length));
             isValid = false;
-        } else if (repository.isDuplicateTitle(title, isEditMode && existingAssignment != null ? existingAssignment.getId() : null)) {
+        } else if (repository.isDuplicateTitle(title, authManager.getCurrentUserId(), isEditMode && existingAssignment != null ? existingAssignment.getId() : null)) {
             tilTitle.setError(getString(R.string.error_duplicate_title));
             isValid = false;
         }
@@ -340,22 +327,12 @@ public class AddAssignmentActivity extends AppCompatActivity {
 
         if (!isValid) return;
 
-        // Determine Priority from chip selection
-        int checkedChipId = chipGroupPriority.getCheckedChipId();
-        String priority = "Medium";
-        if (checkedChipId == R.id.chipPriorityHigh) {
-            priority = "High";
-        } else if (checkedChipId == R.id.chipPriorityLow) {
-            priority = "Low";
-        }
-
         if (isEditMode && existingAssignment != null) {
             existingAssignment.setTitle(title);
             existingAssignment.setSubject(subject);
             existingAssignment.setDescription(description);
             existingAssignment.setDueDate(dueDateStr);
             existingAssignment.setDueDateMillis(selectedDueDateMillis);
-            existingAssignment.setPriority(priority);
             existingAssignment.setReminderTimeMillis(selectedReminderTimeMillis);
 
             boolean success = repository.updateAssignment(existingAssignment);
@@ -372,7 +349,8 @@ public class AddAssignmentActivity extends AppCompatActivity {
                 Toast.makeText(this, R.string.toast_assignment_save_failed, Toast.LENGTH_SHORT).show();
             }
         } else {
-            Assignment newAssignment = new Assignment(title, subject, description, dueDateStr, selectedDueDateMillis, priority);
+            Assignment newAssignment = new Assignment(title, subject, description, dueDateStr, selectedDueDateMillis, "Medium");
+            newAssignment.setUserId(authManager.getCurrentUserId());
             newAssignment.setReminderTimeMillis(selectedReminderTimeMillis);
 
             boolean success = repository.addAssignment(newAssignment);

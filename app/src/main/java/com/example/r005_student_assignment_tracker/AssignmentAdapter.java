@@ -30,10 +30,16 @@ public class AssignmentAdapter extends RecyclerView.Adapter<AssignmentAdapter.Vi
     private final Context context;
     private List<Assignment> assignments = new ArrayList<>();
     private final OnAssignmentActionListener listener;
+    private boolean isTeacherMode = true;
 
     public AssignmentAdapter(Context context, OnAssignmentActionListener listener) {
         this.context = context;
         this.listener = listener;
+    }
+
+    public void setTeacherMode(boolean isTeacherMode) {
+        this.isTeacherMode = isTeacherMode;
+        notifyDataSetChanged();
     }
 
     public void setAssignments(List<Assignment> assignments) {
@@ -85,7 +91,9 @@ public class AssignmentAdapter extends RecyclerView.Adapter<AssignmentAdapter.Vi
             holder.tvPriorityBadge.setTextColor(ContextCompat.getColor(context, R.color.priority_medium));
         }
 
-        // Completion status chip & strikethrough styling
+        // Completion & Missed status chip & strikethrough styling
+        boolean isMissed = !assignment.isCompleted() && assignment.getDueDateMillis() > 0 && assignment.getDueDateMillis() < System.currentTimeMillis();
+
         if (assignment.isCompleted()) {
             holder.tvTitle.setPaintFlags(holder.tvTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             holder.tvTitle.setTextColor(ContextCompat.getColor(context, R.color.text_muted));
@@ -94,6 +102,14 @@ public class AssignmentAdapter extends RecyclerView.Adapter<AssignmentAdapter.Vi
             holder.chipStatus.setTextColor(ContextCompat.getColor(context, R.color.status_completed));
             holder.chipStatus.setChipIconResource(R.drawable.ic_check_circle);
             holder.chipStatus.setChipIconTint(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.status_completed)));
+        } else if (isMissed) {
+            holder.tvTitle.setPaintFlags(holder.tvTitle.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+            holder.tvTitle.setTextColor(ContextCompat.getColor(context, R.color.priority_high));
+            holder.chipStatus.setText(R.string.status_missed);
+            holder.chipStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.priority_high_bg)));
+            holder.chipStatus.setTextColor(ContextCompat.getColor(context, R.color.priority_high));
+            holder.chipStatus.setChipIconResource(R.drawable.ic_priority_high);
+            holder.chipStatus.setChipIconTint(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.priority_high)));
         } else {
             holder.tvTitle.setPaintFlags(holder.tvTitle.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
             holder.tvTitle.setTextColor(ContextCompat.getColor(context, R.color.text_primary));
@@ -109,6 +125,8 @@ public class AssignmentAdapter extends RecyclerView.Adapter<AssignmentAdapter.Vi
                 listener.onStatusToggle(assignment);
             }
         });
+
+        holder.btnDelete.setVisibility(isTeacherMode ? View.VISIBLE : View.GONE);
 
         holder.btnDelete.setOnClickListener(v -> {
             if (listener != null) {

@@ -47,8 +47,8 @@ public class ReminderReceiver extends BroadcastReceiver {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        String title = "Assignment Reminder ⏰";
-        String message = assignment.getTitle() + " (" + assignment.getSubject() + ") is due on " + assignment.getDueDate() + "!";
+        String title = "Assignment Reminder";
+        String message = assignment.getTitle() + " (" + assignment.getSubject() + ") is due on " + assignment.getDueDate() + ".";
 
         ReminderManager.createNotificationChannel(context);
 

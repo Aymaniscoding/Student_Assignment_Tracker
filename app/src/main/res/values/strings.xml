@@ -3,24 +3,27 @@
     <string name="app_subtitle">Student Productivity Tracker</string>
 
     <!-- Dashboard Strings -->
-    <string name="dashboard_greeting">Welcome Back, Student! 🎓</string>
+    <string name="dashboard_greeting">Welcome Back</string>
     <string name="dashboard_overview">Overview &amp; Progress</string>
     <string name="stat_total">Total</string>
     <string name="stat_pending">Pending</string>
     <string name="stat_completed">Completed</string>
+    <string name="stat_missed">Missed</string>
     <string name="stat_high_priority">High Priority</string>
+    <string name="status_missed">Missed</string>
 
     <string name="section_upcoming_assignments">Upcoming Assignments</string>
     <string name="hint_search">Search by title or subject&#8230;</string>
     <string name="filter_all">All</string>
     <string name="filter_pending">Pending</string>
     <string name="filter_completed">Completed</string>
+    <string name="filter_missed">Missed</string>
     <string name="filter_high_priority">High Priority</string>
     <string name="btn_add_assignment">Add Assignment</string>
 
     <!-- Empty States -->
     <string name="empty_state_title">No Assignments Found</string>
-    <string name="empty_state_subtitle">Tap + Add Assignment to create a new task and stay organized!</string>
+    <string name="empty_state_subtitle">Tap + Add Assignment to create a new task and stay organized.</string>
     <string name="empty_search_title">No Matching Assignments</string>
     <string name="empty_search_subtitle">Try searching with a different keyword or changing the filter.</string>
 
@@ -60,9 +63,68 @@
     <string name="error_subject_required">Subject is required</string>
     <string name="error_date_required">Please select a due date</string>
     <string name="error_reminder_past">Reminder time must be in the future</string>
-    <string name="toast_assignment_saved">Assignment saved successfully! ✨</string>
-    <string name="toast_assignment_updated">Assignment updated successfully! ✨</string>
+    <string name="toast_assignment_saved">Assignment saved successfully.</string>
+    <string name="toast_assignment_updated">Assignment updated successfully.</string>
     <string name="toast_assignment_save_failed">Failed to save assignment. Please try again.</string>
     <string name="toast_status_updated">Assignment status updated</string>
     <string name="toast_assignment_deleted">Assignment deleted</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_assignments">Assignments</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Auth Strings -->
+    <string name="title_login">Welcome to CampusFlow</string>
+    <string name="subtitle_login">Sign in to track assignments &amp; boost productivity</string>
+    <string name="title_register">Create Your Account</string>
+    <string name="subtitle_register">Start tracking your assignments with CampusFlow</string>
+
+    <string name="label_role_prompt">Are you a:</string>
+    <string name="role_student">Student</string>
+    <string name="role_teacher">Teacher</string>
+
+    <string name="label_name">Full Name *</string>
+    <string name="hint_name">e.g., Alex Morgan</string>
+    <string name="label_email">Email Address *</string>
+    <string name="hint_email">e.g., alex@student.edu</string>
+    <string name="label_password">Password *</string>
+    <string name="hint_password">At least 6 characters</string>
+    <string name="label_confirm_password">Confirm Password *</string>
+    <string name="hint_confirm_password">Re-enter your password</string>
+
+    <string name="btn_login">Sign In</string>
+    <string name="btn_register">Register</string>
+    <string name="btn_forgot_password">Forgot Password?</string>
+    <string name="link_register">Don\'t have an account? Register</string>
+    <string name="link_login">Already have an account? Sign In</string>
+
+    <!-- Validation & Auth Feedback -->
+    <string name="error_email_invalid">Please enter a valid email address</string>
+    <string name="error_password_short">Password must be at least 6 characters</string>
+    <string name="error_passwords_mismatch">Passwords do not match</string>
+
+    <string name="dialog_forgot_title">Reset Password</string>
+    <string name="dialog_forgot_message">Enter your registered email address to receive password reset instructions.</string>
+    <string name="btn_send_reset">Send Reset Link</string>
+    <string name="toast_reset_sent">Password reset link sent to your email.</string>
+    <string name="toast_login_success">Logged in successfully. Welcome back!</string>
+    <string name="toast_register_success">Account created successfully.</string>
+    <string name="toast_profile_updated">Profile updated successfully.</string>
+
+    <!-- Profile & Calendar -->
+    <string name="title_calendar">Assignment Calendar</string>
+    <string name="title_profile">User Profile</string>
+    <string name="btn_edit_profile">Edit Profile Name</string>
+    <string name="btn_logout">Sign Out</string>
+    <string name="dialog_logout_title">Sign Out</string>
+    <string name="dialog_logout_message">Are you sure you want to sign out from CampusFlow?</string>
+
+    <!-- Student Submissions -->
+    <string name="dialog_submit_title">Submit Assignment</string>
+    <string name="label_submission_notes">Submission Notes / Link</string>
+    <string name="hint_submission_notes">Enter details or link to your submitted work&#8230;</string>
+    <string name="btn_submit_work">Submit Work</string>
+    <string name="toast_submitted">Assignment submitted successfully.</string>
 </resources>
